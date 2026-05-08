@@ -171,41 +171,41 @@ if ($hasTimeFilter && $startMysql && $endMysql) {
     <input type="hidden" name="action" id="booking-action" value="check">
     <input type="hidden" name="selected_spot_id" id="selected_spot_id" value="<?php echo htmlspecialchars($selectedSpot); ?>">
 
-    <div class="row">
+    <div class="row g-4">
         <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header"><i class="bi bi-info-circle me-2"></i>Booking Details</div>
+            <div class="card border-primary border-opacity-10 h-100">
+                <div class="card-header border-0 pb-0"><i class="bi bi-info-circle-fill me-2 text-primary"></i>BOOKING PARAMETERS</div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Vehicle Label</label>
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">VEHICLE IDENTITY</label>
                         <input type="text" name="vehicle_label" class="form-control" placeholder="e.g. CAS-4567" value="<?php echo htmlspecialchars($vehicleLabel); ?>" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Vehicle Type</label>
-                        <select name="vehicle_type" class="form-select">
-                            <option value="Car"  <?php echo $vehicleType === 'Car' ? 'selected' : ''; ?>>Car</option>
-                            <option value="Bike" <?php echo $vehicleType === 'Bike' ? 'selected' : ''; ?>>Bike</option>
-                            <option value="VIP"  <?php echo $vehicleType === 'VIP' ? 'selected' : ''; ?>>VIP</option>
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">NODE TYPE</label>
+                        <select name="vehicle_type" class="form-control">
+                            <option value="Car"  <?php echo $vehicleType === 'Car' ? 'selected' : ''; ?>>Standard Car</option>
+                            <option value="Bike" <?php echo $vehicleType === 'Bike' ? 'selected' : ''; ?>>Motorcycle</option>
+                            <option value="VIP"  <?php echo $vehicleType === 'VIP' ? 'selected' : ''; ?>>VIP / Reserved</option>
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Start Time</label>
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">ENTRY TIME</label>
                         <input type="datetime-local" name="start_time" class="form-control" value="<?php echo htmlspecialchars(toHtmlDateTime($startMysql)); ?>" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">End Time</label>
+                    <div class="mb-5">
+                        <label class="form-label text-secondary small fw-bold">EXIT TIME</label>
                         <input type="datetime-local" name="end_time" class="form-control" value="<?php echo htmlspecialchars(toHtmlDateTime($endMysql)); ?>" required>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary" onclick="document.getElementById('booking-action').value='check';">
-                            <i class="bi bi-search me-2"></i>Check Availability
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn-primary w-100" onclick="document.getElementById('booking-action').value='check';">
+                            SCAN FOR AVAILABILITY <i class="bi bi-broadcast ms-2"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='user_booking_new.php';">
-                            <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                        <button type="button" class="btn btn-outline-secondary border-opacity-25 w-100" onclick="window.location.href='user_booking_new.php';">
+                            RESET NODES
                         </button>
                     </div>
                 </div>
@@ -214,21 +214,21 @@ if ($hasTimeFilter && $startMysql && $endMysql) {
 
         <div class="col-lg-8">
             <?php if ($hasTimeFilter && $startMysql && $endMysql): ?>
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-grid-3x3-gap me-2"></i>Parking Slot Selection</span>
-                        <div class="parking-grid-legend mb-0">
+                <div class="card border-info border-opacity-10">
+                    <div class="card-header d-flex justify-content-between align-items-center border-0">
+                        <span class="fw-bold"><i class="bi bi-cpu me-2 text-info"></i>LIVE PARKING GRID</span>
+                        <div class="d-flex gap-3 small text-secondary">
                             <span><span class="parking-legend-box parking-legend-available"></span>Free</span>
                             <span><span class="parking-legend-box parking-legend-selected"></span>Choice</span>
-                            <span><span class="parking-legend-box parking-legend-booked"></span>Taken</span>
+                            <span><span class="parking-legend-box parking-legend-booked"></span>Busy</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="parking-grid mb-4">
                             <?php if (!$allSpots): ?>
                                 <div class="text-center py-5">
-                                    <i class="bi bi-exclamation-circle text-muted fs-1"></i>
-                                    <p class="text-muted mt-2">No parking spots configured for this facility.</p>
+                                    <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
+                                    <p class="text-secondary mt-2">No parking nodes detected in this sector.</p>
                                 </div>
                             <?php else: ?>
                                 <?php foreach ($allSpots as $spot):
@@ -249,31 +249,33 @@ if ($hasTimeFilter && $startMysql && $endMysql) {
                             <?php endif; ?>
                         </div>
 
-                        <div id="selection-summary" class="p-3 rounded-3 bg-opacity-10 bg-info border border-info mb-4" style="<?php echo $selectedSpot ? '' : 'display:none;'; ?>">
+                        <div id="selection-summary" class="p-4 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-25 mb-4" style="<?php echo $selectedSpot ? 'animation: slideInUp 0.5s ease-out;' : 'display:none;'; ?>">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="small text-uppercase opacity-75">Target Slot</div>
-                                    <div class="h5 mb-0 fw-bold" id="selected_spot_label"><?php echo $selectedSpot ? htmlspecialchars($selectedSpot) : 'None'; ?></div>
+                                    <div class="small text-info fw-bold opacity-75">SELECTED SLOT IDENTITY</div>
+                                    <div class="h3 mb-0 fw-800 text-white" id="selected_spot_label"><?php echo $selectedSpot ? htmlspecialchars($selectedSpot) : 'None'; ?></div>
                                 </div>
-                                <button type="submit" class="btn btn-success" onclick="document.getElementById('booking-action').value='confirm_booking';">
-                                    Book This Spot <i class="bi bi-arrow-right-circle ms-1"></i>
+                                <button type="submit" class="btn-primary bg-success border-0 px-4" onclick="document.getElementById('booking-action').value='confirm_booking';">
+                                    INITIALIZE BOOKING <i class="bi bi-arrow-right-circle-fill ms-2"></i>
                                 </button>
                             </div>
                         </div>
 
                         <?php if (!$selectedSpot): ?>
-                            <div class="alert alert-info border-0 bg-opacity-10 bg-info text-info small mb-0">
-                                <i class="bi bi-info-circle-fill me-2"></i>Please click on an available (blue) spot above to select it.
+                            <div class="p-3 bg-dark bg-opacity-50 rounded-4 border border-secondary border-opacity-10 text-center text-secondary small">
+                                <i class="bi bi-cursor-fill me-2 text-info"></i>Select an available node from the grid above to proceed.
                             </div>
                         <?php endif; ?>
                     </div>
                 </div>
             <?php else: ?>
-                <div class="card border-dashed d-flex align-items-center justify-content-center py-5 text-center bg-transparent" style="border: 2px dashed var(--glass-border);">
-                    <div class="card-body">
-                        <i class="bi bi-calendar-range text-secondary fs-1 mb-3"></i>
-                        <h5>Set Your Schedule</h5>
-                        <p class="text-secondary small">Define your arrival and departure times to see available spots.</p>
+                <div class="card h-100 border-dashed border-opacity-25 d-flex align-items-center justify-content-center py-5 text-center">
+                    <div class="card-body py-5">
+                        <div class="p-4 bg-dark bg-opacity-50 rounded-circle d-inline-flex mb-4 border border-secondary border-opacity-10" style="animation: float 6s infinite ease-in-out;">
+                            <i class="bi bi-calendar-event text-secondary fs-1"></i>
+                        </div>
+                        <h4 class="text-white fw-bold">Node Scan Required</h4>
+                        <p class="text-secondary small mx-auto" style="max-width: 300px;">Please define your entry and exit timestamps on the left to scan for available parking nodes.</p>
                     </div>
                 </div>
             <?php endif; ?>

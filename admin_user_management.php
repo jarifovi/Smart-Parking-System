@@ -30,88 +30,80 @@ $result = $databaseConnection->query("SELECT * FROM users $where ORDER BY create
     <div class="page-header-sub">Manage registered accounts, roles, and system access.</div>
 </div>
 
-<div class="card mb-4">
+<div class="card mb-5 border-primary border-opacity-10">
     <div class="card-body">
-        <form class="row g-3" method="get">
+        <form class="row g-3 align-items-center" method="get">
             <div class="col-md-5">
                 <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0 border-secondary-subtle">
+                    <span class="input-group-text bg-dark border-end-0 border-secondary border-opacity-10">
                         <i class="bi bi-search text-secondary"></i>
                     </span>
-                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Search name or email" value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="text" name="search" class="form-control bg-dark border-start-0 ps-0" placeholder="Identity Search..." value="<?php echo htmlspecialchars($search); ?>">
                 </div>
             </div>
             <div class="col-md-3">
-                <select name="filter" class="form-select">
+                <select name="filter" class="form-control">
                     <option value="all"     <?php echo $filter==='all'?'selected':''; ?>>All Access Roles</option>
                     <option value="admins"  <?php echo $filter==='admins'?'selected':''; ?>>Administrators</option>
                     <option value="regular" <?php echo $filter==='regular'?'selected':''; ?>>Standard Users</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100">
-                    <i class="bi bi-funnel me-1"></i> Filter
-                </button>
-            </div>
-            <div class="col-md-2">
-                <a href="auth_register.php" class="btn btn-success w-100">
-                    <i class="bi bi-person-plus me-1"></i> Add User
-                </a>
+            <div class="col-md-4">
+                <div class="d-flex gap-2">
+                    <button class="btn-primary w-100 py-2">
+                        FILTER NODES
+                    </button>
+                    <a href="auth_register.php" class="btn btn-outline-info w-100 border-opacity-25">
+                        <i class="bi bi-person-plus me-1"></i> ADD
+                    </a>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table mb-0">
-                <thead>
+<div class="card p-0 overflow-hidden border-info border-opacity-10">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0">
+            <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Email Address</th>
-                    <th>System Role</th>
-                    <th>Registration Date</th>
-                    <th class="text-end">Actions</th>
+                    <th class="ps-4 small opacity-50">ID</th>
+                    <th class="small opacity-50">IDENTITY</th>
+                    <th class="small opacity-50">NETWORK EMAIL</th>
+                    <th class="small opacity-50">PRIVILEGE</th>
+                    <th class="small opacity-50">REGISTRATION</th>
+                    <th class="text-end pe-4 small opacity-50">ACTIONS</th>
                 </tr>
-                </thead>
-                <tbody>
+            </thead>
+            <tbody>
                 <?php if ($result && $result->num_rows): while ($u=$result->fetch_assoc()): ?>
-                    <tr>
-                        <td>#<?php echo $u['id']; ?></td>
-                        <td class="fw-semibold"><?php echo htmlspecialchars($u['full_name']); ?></td>
-                        <td><?php echo htmlspecialchars($u['email']); ?></td>
+                    <tr class="align-middle">
+                        <td class="ps-4 py-3"><code class="text-info">#<?php echo $u['id']; ?></code></td>
+                        <td class="fw-bold text-white"><?php echo htmlspecialchars($u['full_name']); ?></td>
+                        <td><span class="text-secondary"><?php echo htmlspecialchars($u['email']); ?></span></td>
                         <td>
                             <?php if ($u['is_admin']): ?>
-                                <span class="badge bg-danger"><i class="bi bi-shield-lock me-1"></i>ADMIN</span>
+                                <span class="badge bg-primary bg-opacity-10 text-info border border-info border-opacity-25 px-3">ROOT ADMIN</span>
                             <?php else: ?>
-                                <span class="badge bg-info"><i class="bi bi-person me-1"></i>USER</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3">OPERATOR</span>
                             <?php endif; ?>
                         </td>
-                        <td class="small"><?php echo date('M d, Y H:i', strtotime($u['created_at'])); ?></td>
-                        <td class="text-end">
+                        <td class="small text-secondary"><?php echo date('M d, Y', strtotime($u['created_at'])); ?></td>
+                        <td class="text-end pe-4">
                             <a href="?delete=<?php echo $u['id']; ?>" 
-                               class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Permanently delete this user?')"
-                               title="Delete User">
-                                <i class="bi bi-person-x-fill"></i>
+                               class="btn btn-sm btn-outline-danger border-opacity-25"
+                               onclick="return confirm('Disconnect this operator node?')">
+                                <i class="bi bi-shield-x"></i>
                             </a>
                         </td>
                     </tr>
                 <?php endwhile; else: ?>
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="bi bi-people text-secondary fs-1 mb-2 d-block"></i>
-                            <div class="text-secondary">No users found matching criteria.</div>
-                        </td>
-                    </tr>
+                    <tr><td colspan="6" class="text-center py-5">No operator nodes detected.</td></tr>
                 <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
 </div>
 <?php
-// helper_layout_admin.php will close tags
+require_once 'helper_layout_footer.php';
 ?>

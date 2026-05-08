@@ -70,4 +70,20 @@ if (!empty($loggedUser['full_name'])) {
 
     <!-- Main Content -->
     <div class="content-area">
+        <!-- Top System Bar -->
+        <header class="d-flex justify-content-between align-items-center mb-5 p-3 rounded-4 bg-dark bg-opacity-25 border border-secondary border-opacity-10 backdrop-blur">
+            <div class="d-flex align-items-center gap-2">
+                <div class="spinner-grow spinner-grow-sm text-primary"></div>
+                <span class="small text-secondary fw-bold">ZONE STATUS: <span class="text-success">GATES OPEN</span></span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="position-relative cursor-pointer">
+                    <i class="bi bi-chat-dots text-secondary fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-info border border-light rounded-circle" style="width: 8px; height: 8px;"></span>
+                </div>
+                <div class="vr bg-secondary opacity-25" style="height: 20px;"></div>
+                <div class="small text-white fw-bold d-none d-md-block"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
+            </div>
+        </header>
+
         <main class="page-content" style="animation: slideInUp 0.8s ease-out;">

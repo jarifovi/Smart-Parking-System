@@ -102,6 +102,20 @@ $stats = $databaseConnection->query("
     </div>
 
     <div class="col-lg-4">
+        <!-- Smart Weather Card -->
+        <div class="card border-warning border-opacity-20 mb-4" style="background: rgba(245, 158, 11, 0.05);">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="small fw-bold text-warning"><i class="bi bi-cloud-sun me-2"></i>ENV-INTEL</span>
+                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">RAIN DETECTED</span>
+            </div>
+            <h6 class="text-white fw-bold">Smart Recommendation</h6>
+            <p class="text-secondary small mb-3">Heavy rain detected at terminal. We recommend booking **Zone B (Covered)** for vehicle protection.</p>
+            <div class="progress bg-dark mb-3" style="height: 4px;">
+                <div class="progress-bar bg-warning" style="width: 75%"></div>
+            </div>
+            <a href="user_booking_new.php" class="btn btn-sm btn-warning bg-opacity-10 text-warning border-warning border-opacity-25 w-100">GO TO COVERED ZONE</a>
+        </div>
+
         <div class="card border-primary border-opacity-10 h-100">
             <h5 class="fw-bold mb-4"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>QUICK ACTIONS</h5>
             <div class="d-grid gap-3">
@@ -122,6 +136,20 @@ $stats = $databaseConnection->query("
         </div>
     </div>
 </div>
+
+<script>
+// AI Voice Greeting for User
+document.addEventListener('DOMContentLoaded', function() {
+    if (!sessionStorage.getItem('user_greeted')) {
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = "Portal access granted. Welcome to your command center, <?php echo explode(' ', $loggedUser['full_name'])[0]; ?>. Zone B is now available for covered parking.";
+        msg.rate = 1.0;
+        msg.pitch = 0.9;
+        window.speechSynthesis.speak(msg);
+        sessionStorage.setItem('user_greeted', 'true');
+    }
+});
+</script>
 <?php
-// Layout helper closes tags
+require_once 'helper_layout_footer.php';
 ?>

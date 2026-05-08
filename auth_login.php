@@ -33,7 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="ui_theme_main.css">
     <style>
-        body { padding: 0 !important; margin: 0 !important; background: #020617; overflow: hidden; }
+        body { 
+            padding: 0 !important; margin: 0 !important; 
+            background: #020617 url('futuristic_dark_parking_bg_1778267355133.png') no-repeat center center fixed !important;
+            background-size: cover !important;
+            overflow: hidden; 
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(2, 6, 23, 0.9) 100%) !important;
+        }
         .particle {
             position: absolute; background: rgba(56, 189, 248, 0.2); border-radius: 50%;
             pointer-events: none; animation: float 15s infinite ease-in-out;
@@ -57,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="card p-4 p-md-5 border-info border-opacity-10" style="animation: slideInUp 0.8s ease-out both;">
+                <!-- Glow Scan Biometric Simulation -->
+                <div class="position-absolute top-0 start-0 w-100" style="height: 2px; background: var(--accent-glow); box-shadow: 0 0 15px var(--accent-glow); animation: scanLine 3s infinite ease-in-out; opacity: 0.5;"></div>
+                
                 <?php foreach ($errors as $e): ?>
                     <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger small mb-4">
                         <i class="bi bi-exclamation-octagon-fill me-2"></i><?php echo $e; ?>
