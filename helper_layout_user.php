@@ -68,16 +68,27 @@ if (!empty($loggedUser['full_name'])) {
 
     <!-- Main Content -->
     <div class="content-area">
-        <!-- Top System Bar -->
         <header class="d-flex justify-content-between align-items-center mb-5 p-3 rounded-4 bg-dark bg-opacity-25 border border-secondary border-opacity-10 backdrop-blur">
             <div class="d-flex align-items-center gap-2">
-                <div class="spinner-grow spinner-grow-sm text-primary"></div>
+                <div class="spinner-grow spinner-grow-sm text-info"></div>
                 <span class="small text-secondary fw-bold">ZONE STATUS: <span class="text-success">GATES OPEN</span></span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="position-relative cursor-pointer">
-                    <i class="bi bi-chat-dots text-secondary fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-info border border-light rounded-circle" style="width: 8px; height: 8px;"></span>
+                <!-- Notification Node -->
+                <div class="dropdown">
+                    <div class="position-relative cursor-pointer" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell text-secondary fs-5"></i>
+                        <span id="unreadCountDot" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none" style="width: 10px; height: 10px;"></span>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end p-0 border-0 shadow-lg mt-3" aria-labelledby="notifDropdown" style="width: 320px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 20px;">
+                        <li class="p-3 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-white small">USER NOTIFICATIONS</span>
+                            <a href="javascript:void(0)" onclick="markNotificationsRead()" class="x-small text-info text-decoration-none fw-bold">CLEAR ALL</a>
+                        </li>
+                        <div id="notifList" class="overflow-auto" style="max-height: 350px;">
+                            <li class="p-4 text-center text-secondary small">Scanning for alerts...</li>
+                        </div>
+                    </ul>
                 </div>
                 <div class="vr bg-secondary opacity-25" style="height: 20px;"></div>
                 <div class="small text-white fw-bold d-none d-md-block"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
