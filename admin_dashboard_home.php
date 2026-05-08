@@ -170,32 +170,62 @@ $totalRevenue   = $databaseConnection->query("SELECT IFNULL(SUM(amount),0) AS s 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 const ctx = document.getElementById('revenueChart').getContext('2d');
-const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-gradient.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
-gradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
+const glowGradient = ctx.createLinearGradient(0, 0, 0, 400);
+glowGradient.addColorStop(0, 'rgba(56, 189, 248, 0.6)');
+glowGradient.addColorStop(0.5, 'rgba(56, 189, 248, 0.1)');
+glowGradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
 
 new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
         datasets: [{
-            label: 'Network Revenue ($)',
-            data: [120, 190, 150, 280, 220, 400, 350],
+            label: 'REVENUE TELEMETRY',
+            data: [1200, 1900, 1500, 2800, 2200, 4000, 3500],
             borderColor: '#38bdf8',
-            borderWidth: 3,
+            borderWidth: 5,
             fill: true,
-            backgroundColor: gradient,
-            tension: 0.4,
-            pointBackgroundColor: '#38bdf8',
-            pointRadius: 4
+            backgroundColor: glowGradient,
+            tension: 0.5,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#38bdf8',
+            pointBorderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#38bdf8',
+            pointHoverBorderWidth: 4,
         }]
     },
     options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(5, 5, 5, 0.8)',
+                titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                bodyFont: { family: 'Outfit', size: 16 },
+                padding: 15,
+                cornerRadius: 20,
+                displayColors: false,
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                callbacks: {
+                    label: (item) => `$${item.raw.toLocaleString()}`
+                }
+            }
+        },
         scales: {
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { 
+                grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false }, 
+                ticks: { color: '#64748b', font: { family: 'Outfit', size: 10, weight: '600' } } 
+            },
+            x: { 
+                grid: { display: false }, 
+                ticks: { color: '#64748b', font: { family: 'Outfit', size: 10, weight: '600' } } 
+            }
         }
     }
 });
