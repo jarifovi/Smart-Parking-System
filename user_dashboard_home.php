@@ -1,154 +1,127 @@
 <?php
-// user_dashboard_home.php
-$pageTitle  = 'User Dashboard';
+$pageTitle  = 'My Command Center';
 $sidebarKey = 'user_dashboard';
-
-// TEMP: enable errors so we can see problems if any
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 require_once 'helper_layout_user.php';
 
-$userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-
-// ---------- SAFE STATS QUERIES ----------
-$totalSpots = 0;
-$activeBookings = 0;
-$availableSpots = 0;
-$completedCount = 0;
-$totalSpent = 0.0;
-
-// total spots
-if ($res = $databaseConnection->query("SELECT COUNT(*) AS c FROM parking_spots WHERE is_active = 1")) {
-    if ($row = $res->fetch_assoc()) {
-        $totalSpots = (int)$row['c'];
-    }
-}
-
-// active bookings for this user
-if ($res = $databaseConnection->query("SELECT COUNT(*) AS c FROM bookings WHERE user_id = {$userId} AND status = 'active'")) {
-    if ($row = $res->fetch_assoc()) {
-        $activeBookings = (int)$row['c'];
-    }
-}
-
-// completed bookings
-if ($res = $databaseConnection->query("SELECT COUNT(*) AS c FROM bookings WHERE user_id = {$userId} AND status = 'completed'")) {
-    if ($row = $res->fetch_assoc()) {
-        $completedCount = (int)$row['c'];
-    }
-}
-
-// total spent
-if ($res = $databaseConnection->query("SELECT IFNULL(SUM(amount),0) AS s FROM payments WHERE user_id = {$userId} AND payment_status = 'paid'")) {
-    if ($row = $res->fetch_assoc()) {
-        $totalSpent = (float)$row['s'];
-    }
-}
-
-$availableSpots = max(0, $totalSpots - $activeBookings);
+$userId = (int)$_SESSION['user_id'];
+$stats = $databaseConnection->query("
+    SELECT 
+        (SELECT COUNT(*) FROM bookings WHERE user_id = $userId) as total_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE user_id = $userId AND status = 'active') as active_bookings,
+        (SELECT IFNULL(SUM(amount),0) FROM payments WHERE user_id = $userId) as total_spent
+")->fetch_assoc();
 ?>
 
-<div class="page-header-main">
-    <div>
-        <div class="page-header-title">
-            Welcome back, <?php echo htmlspecialchars($loggedUser['full_name'] ?? 'User'); ?> 👋
+<div class="page-header-main mb-5">
+    <div class="d-flex align-items-center gap-3">
+        <div class="p-3 bg-info bg-opacity-10 rounded-4 border border-info border-opacity-25">
+            <i class="bi bi-person-workspace text-info fs-3"></i>
         </div>
-        <div class="page-header-sub">
-            Here’s a quick overview of your parking activity.
+        <div>
+            <h2 class="fw-800 text-white m-0">Welcome Back, <?php echo explode(' ', $loggedUser['full_name'])[0]; ?></h2>
+            <p class="text-secondary m-0">Your parking network is active and healthy.</p>
         </div>
     </div>
 </div>
 
 <div class="row g-4 mb-5">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100">
-            <div class="card-body">
-                <div class="stat-card-label">Available Spots</div>
-                <div class="stat-card-number"><?php echo number_format($availableSpots); ?></div>
-            </div>
+            <div class="stat-card-label">Registered Sessions</div>
+            <div class="stat-card-number"><?php echo $stats['total_bookings']; ?></div>
+            <div class="small text-secondary mt-2">Lifetime reservations</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card h-100">
-            <div class="card-body border-start border-primary border-4">
-                <div class="stat-card-label">Active Bookings</div>
-                <div class="stat-card-number text-primary"><?php echo number_format($activeBookings); ?></div>
-            </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-info border-opacity-20" style="background: rgba(56, 189, 248, 0.05);">
+            <div class="stat-card-label text-info">Current Active</div>
+            <div class="stat-card-number"><?php echo $stats['active_bookings']; ?></div>
+            <div class="small text-secondary mt-2">Live sessions at terminal</div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100">
-            <div class="card-body">
-                <div class="stat-card-label">Completed</div>
-                <div class="stat-card-number"><?php echo number_format($completedCount); ?></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="stat-card-label">Total Spent</div>
-                <div class="stat-card-number">$<?php echo number_format($totalSpent, 0); ?></div>
-            </div>
+            <div class="stat-card-label">Total Investment</div>
+            <div class="stat-card-number">$<?php echo number_format($stats['total_spent'], 2); ?></div>
+            <div class="small text-secondary mt-2">Aggregated payment volume</div>
         </div>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span class="fw-bold"><i class="bi bi-clock-history me-2"></i>ACTIVE BOOKINGS</span>
-        <a href="user_bookings_list.php" class="btn btn-sm btn-outline-secondary">History</a>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table mb-0">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Spot</th>
-                        <th>Vehicle</th>
-                        <th>Duration</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                $sql = "
-                    SELECT b.*, p.spot_number 
-                    FROM bookings b 
-                    JOIN parking_spots p ON b.spot_id = p.id
-                    WHERE b.user_id = {$userId} AND b.status = 'active'
-                    ORDER BY b.start_time DESC
-                ";
-                if ($result = $databaseConnection->query($sql)) {
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) { ?>
-                            <tr>
-                                <td>#<?php echo $row['id']; ?></td>
-                                <td><span class="badge bg-info"><?php echo htmlspecialchars($row['spot_number']); ?></span></td>
-                                <td><?php echo htmlspecialchars($row['vehicle_label']); ?></td>
-                                <td class="small"><?php echo date('M d, H:i', strtotime($row['start_time'])) . ' - ' . date('H:i', strtotime($row['end_time'])); ?></td>
-                                <td class="fw-bold">$<?php echo number_format($row['amount'], 2); ?></td>
-                                <td><span class="badge bg-success">ACTIVE</span></td>
-                            </tr>
-                        <?php }
-                    } else { ?>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card p-0 overflow-hidden">
+            <div class="p-4 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                <h5 class="m-0 fw-bold"><i class="bi bi-activity me-2 text-info"></i>LIVE RECENT ACTIVITY</h5>
+                <a href="user_bookings_list.php" class="btn btn-sm btn-outline-info border-opacity-25 px-3">Sync All Data</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead class="bg-dark bg-opacity-50">
                         <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <i class="bi bi-calendar-x text-secondary fs-2 mb-2 d-block"></i>
-                                <div class="text-secondary">No active bookings found.</div>
-                                <a href="user_booking_new.php" class="btn btn-sm btn-primary mt-3">Book Now</a>
-                            </td>
+                            <th class="border-0 ps-4 small">UID</th>
+                            <th class="border-0 small">ZONE / SPOT</th>
+                            <th class="border-0 small">TIMELINE</th>
+                            <th class="border-0 small text-end pe-4">STATUS</th>
                         </tr>
-                    <?php }
-                } ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="border-0">
+                        <?php
+                        $recent = $databaseConnection->query("
+                            SELECT b.*, p.spot_number 
+                            FROM bookings b 
+                            JOIN parking_spots p ON b.spot_id = p.id 
+                            WHERE b.user_id = $userId 
+                            ORDER BY b.created_at DESC LIMIT 5
+                        ");
+                        if ($recent && $recent->num_rows):
+                            while ($r = $recent->fetch_assoc()): ?>
+                            <tr class="align-middle">
+                                <td class="ps-4 py-3"><code class="text-info">#<?php echo $r['id']; ?></code></td>
+                                <td>
+                                    <div class="fw-bold text-white"><?php echo htmlspecialchars($r['spot_number']); ?></div>
+                                    <div class="text-secondary small">Main Terminal Zone</div>
+                                </td>
+                                <td class="small text-secondary">
+                                    <?php echo date('M d, H:i', strtotime($r['start_time'])); ?>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <span class="badge bg-<?php echo $r['status'] === 'active' ? 'success' : 'secondary'; ?> bg-opacity-10 text-<?php echo $r['status'] === 'active' ? 'success' : 'secondary'; ?> border border-<?php echo $r['status'] === 'active' ? 'success' : 'secondary'; ?> border-opacity-25">
+                                        <?php echo strtoupper($r['status']); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endwhile;
+                        else: ?>
+                            <tr><td colspan="4" class="text-center py-5 text-secondary">No telemetry data detected.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-primary border-opacity-10 h-100">
+            <h5 class="fw-bold mb-4"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>QUICK ACTIONS</h5>
+            <div class="d-grid gap-3">
+                <a href="user_booking_new.php" class="btn-primary text-center text-decoration-none">
+                    <i class="bi bi-plus-circle me-2"></i> RESERVE NEW SPOT
+                </a>
+                <a href="user_vehicles.php" class="btn btn-outline-info w-100 py-3 border-opacity-25">
+                    <i class="bi bi-car-front me-2"></i> MANAGE MY FLEET
+                </a>
+                <div class="p-3 bg-dark bg-opacity-50 rounded-4 border border-secondary border-opacity-10 mt-2">
+                    <div class="small text-secondary mb-2">NETWORK STATUS</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="spinner-grow spinner-grow-sm text-success"></span>
+                        <span class="text-success small fw-bold">LATENCY: 12ms</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <?php
-// helper_layout_user.php will close tags
+// Layout helper closes tags
 ?>

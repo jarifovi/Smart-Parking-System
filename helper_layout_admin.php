@@ -1,5 +1,4 @@
 <?php
-// helper_layout_admin.php
 require_once 'helper_authentication.php';
 requireAdmin();
 $loggedUser = getLoggedUser($databaseConnection);
@@ -13,130 +12,65 @@ if (!empty($loggedUser['full_name'])) {
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title><?php echo htmlspecialchars($pageTitle ?? 'Smart Parking – Admin'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap + Icons -->
+    <title><?php echo htmlspecialchars($pageTitle ?? 'Admin Dashboard'); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- Global UI theme -->
     <link rel="stylesheet" href="ui_theme_main.css">
+    <style>
+        .gravity-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+        }
+    </style>
 </head>
 <body>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarMenu = document.getElementById('sidebarMenu');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    if (sidebarToggle && sidebarMenu && sidebarOverlay) {
-        sidebarToggle.addEventListener('click', function() {
-            sidebarMenu.classList.toggle('show');
-            sidebarOverlay.classList.toggle('show');
-        });
-
-        sidebarOverlay.addEventListener('click', function() {
-            sidebarMenu.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-        });
-    }
-
-    // Add developer footer to the end of .page-content
-    const pageContent = document.querySelector('.page-content');
-    if (pageContent) {
-        const footer = document.createElement('footer');
-        footer.className = 'dev-footer';
-        footer.innerHTML = `
-            <div class="container">
-                <p>&copy; ${new Date().getFullYear()} <span class="code-tag">Smart Parking Admin</span></p>
-                <p>Engineered for Excellence by <a href="#">Jarif Ovi</a></p>
-                <div class="mt-2">
-                    <span class="badge bg-info mx-1">Admin Panel</span>
-                    <span class="badge bg-info mx-1">Analytics Engine</span>
-                    <span class="badge bg-info mx-1">Secure Auth</span>
-                </div>
+    <div class="gravity-bg"></div>
+    <div class="gravity-dot" style="top: 10%; left: 15%; animation-duration: 8s;"></div>
+    <div class="gravity-dot" style="top: 70%; left: 80%; animation-duration: 12s; animation-delay: -3s;"></div>
+    <div class="gravity-dot" style="top: 40%; left: 90%; animation-duration: 10s; animation-delay: -5s; background: var(--accent-violet);"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar-fixed" id="sidebarMenu">
+        <div class="text-center mb-5">
+            <div class="d-inline-flex p-3 rounded-4 bg-primary bg-opacity-10 mb-3" style="border: 1px solid rgba(56, 189, 248, 0.3);">
+                <i class="bi bi-p-circle-fill fs-2 text-info"></i>
             </div>
-        `;
-        pageContent.appendChild(footer);
-    }
-});
-</script>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark sp-navbar fixed-top">
-    <div class="container-fluid">
-        <button class="mobile-toggle" type="button" id="sidebarToggle">
-            <i class="bi bi-list"></i>
-        </button>
-        <div class="d-flex align-items-center gap-2">
-            <span class="navbar-brand mb-0">Smart Parking</span>
-            <span class="brand-pill">Admin Panel</span>
+            <h4 class="fw-800 text-white m-0">SMART PARKING</h4>
+            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 mt-2">ADMIN CORE v3.0</span>
         </div>
 
-        <div class="d-flex align-items-center ms-auto gap-1">
-            <button class="icon-button" type="button">
-                <i class="bi bi-bell"></i>
-            </button>
-
-            <div class="dropdown">
-                <button class="icon-button dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
-                    <span class="avatar-pill">
-                        <span class="avatar-initials"><?php echo htmlspecialchars($initials ?: 'A'); ?></span>
-                        <span class="d-none d-md-inline"><?php echo htmlspecialchars($loggedUser['full_name'] ?? 'Admin'); ?></span>
-                    </span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="user_profile_settings.php"><i class="bi bi-person-gear me-2"></i>Edit Profile</a></li>
-                </ul>
-            </div>
-
-            <a href="auth_logout.php" class="icon-button text-danger" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
+        <nav class="nav flex-column gap-2">
+            <a href="admin_dashboard_home.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_dashboard' ? 'active' : ''; ?>">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard Overview
             </a>
+            <a href="admin_user_management.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_users' ? 'active' : ''; ?>">
+                <i class="bi bi-people-fill"></i> Operator Control
+            </a>
+            <a href="admin_parking_spot_management.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_spots' ? 'active' : ''; ?>">
+                <i class="bi bi-geo-fill"></i> Zone Management
+            </a>
+            <a href="admin_booking_management.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_bookings' ? 'active' : ''; ?>">
+                <i class="bi bi-calendar-event-fill"></i> Active Sessions
+            </a>
+        </nav>
+
+        <div class="mt-auto pt-5">
+            <div class="card bg-dark bg-opacity-50 border-0 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-initials bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold;">
+                        <?php echo $initials; ?>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="small fw-bold text-white text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
+                        <div class="text-secondary small" style="font-size: 0.7rem;">Super Administrator</div>
+                    </div>
+                </div>
+                <a href="auth_logout.php" class="btn btn-sm btn-outline-danger w-100 mt-3 border-opacity-25">Logout System</a>
+            </div>
         </div>
     </div>
-</nav>
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-<!-- SIDEBAR -->
-<div class="sidebar-fixed" id="sidebarMenu">
-    <div class="sidebar-section-title">Admin Menu</div>
-
-    <a href="admin_dashboard_home.php"
-       class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_dashboard' ? 'active' : ''; ?>">
-        <i class="bi bi-speedometer2"></i><span>Dashboard</span>
-    </a>
-
-    <a href="admin_user_management.php"
-       class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_users' ? 'active' : ''; ?>">
-        <i class="bi bi-people"></i><span>User Management</span>
-    </a>
-
-    <a href="admin_parking_spot_management.php"
-       class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_spots' ? 'active' : ''; ?>">
-        <i class="bi bi-parking"></i><span>Parking Spots</span>
-    </a>
-
-    <a href="admin_booking_management.php"
-       class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_bookings' ? 'active' : ''; ?>">
-        <i class="bi bi-journal-text"></i><span>Bookings</span>
-    </a>
-
-    <a href="admin_payment_management.php"
-       class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_payments' ? 'active' : ''; ?>">
-        <i class="bi bi-credit-card"></i><span>Payments</span>
-    </a>
-
-    <a href="admin_report_analytics.php"
-       class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_reports' ? 'active' : ''; ?>">
-        <i class="bi bi-graph-up-arrow"></i><span>Reports &amp; Analytics</span>
-    </a>
-</div>
-
-<!-- MAIN CONTENT WRAPPER (everything after this is page-specific) -->
-<div class="content-area">
-    <main class="page-content">
+    <!-- Main Content -->
+    <div class="content-area">
+        <main class="page-content" style="animation: slideInUp 0.8s ease-out;">
