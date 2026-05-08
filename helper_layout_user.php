@@ -27,8 +27,8 @@ if (!empty($loggedUser['full_name'])) {
     <!-- Sidebar -->
     <div class="sidebar-fixed">
         <div class="sidebar-brand">
-            <h4>SP CORE <small class="text-mute fs-6 opacity-50">v3.0</small></h4>
-            <div class="small text-info opacity-75 fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">USER COMMAND NODE</div>
+            <h4 class="m-0">SP CORE <small class="text-mute opacity-50 fw-normal">v3.0</small></h4>
+            <div class="x-small text-info opacity-50 fw-bold mt-1" style="letter-spacing: 1px; font-size: 0.6rem;">USER NODE</div>
         </div>
 
         <nav class="flex-grow-1">
@@ -50,18 +50,18 @@ if (!empty($loggedUser['full_name'])) {
             </a>
         </nav>
 
-        <div class="mt-auto pt-4 border-top border-secondary border-opacity-10">
-            <div class="d-flex align-items-center gap-3 mb-3 px-2">
-                <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+        <div class="mt-auto pt-3 border-top border-secondary border-opacity-10">
+            <div class="d-flex align-items-center gap-2 mb-3 px-2">
+                <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
                     <i class="bi bi-person-fill"></i>
                 </div>
                 <div class="overflow-hidden">
-                    <div class="text-white small fw-bold text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
-                    <div class="text-mute x-small opacity-50">Member #<?php echo $loggedUser['id']; ?></div>
+                    <div class="text-white x-small fw-bold text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
+                    <div class="text-mute" style="font-size: 0.6rem; opacity: 0.5;">ID: #<?php echo $loggedUser['id']; ?></div>
                 </div>
             </div>
             <a href="auth_logout.php" class="btn btn-outline-danger w-100 py-2 border-opacity-25 x-small fw-bold">
-                TERMINATE SESSION
+                TERMINATE
             </a>
         </div>
     </div>
