@@ -790,14 +790,183 @@ body::before {
     border-radius: 4px;
 }
 
-/* Animations */
+/* ========== PREMIUM ANIMATIONS ========== */
 @keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 5px rgba(59,130,246,0.2); }
+    50% { box-shadow: 0 0 20px rgba(59,130,246,0.4), 0 0 40px rgba(59,130,246,0.1); }
+}
+
+@keyframes borderGlow {
+    0%, 100% { border-color: rgba(59,130,246,0.3); }
+    50% { border-color: rgba(59,130,246,0.6); }
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+}
+
+/* Staggered card entrance */
+.row > [class*="col-"]:nth-child(1) .card { animation: fadeInUp 0.5s ease-out 0.1s both; }
+.row > [class*="col-"]:nth-child(2) .card { animation: fadeInUp 0.5s ease-out 0.2s both; }
+.row > [class*="col-"]:nth-child(3) .card { animation: fadeInUp 0.5s ease-out 0.3s both; }
+.row > [class*="col-"]:nth-child(4) .card { animation: fadeInUp 0.5s ease-out 0.4s both; }
+
+/* Premium card glow on hover */
+.card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 30px rgba(59,130,246,0.08);
+}
+
+/* Stat card shimmer effect */
+.stat-card-number {
+    background: linear-gradient(90deg, #fff 0%, #60a5fa 50%, #fff 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+}
+
+/* Active sidebar glow */
+.sidebar-link.active {
+    animation: borderGlow 2s ease-in-out infinite;
+}
+
+/* Button ripple effect */
+.btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transition: opacity 0.4s ease;
+}
+.btn { position: relative; overflow: hidden; }
+.btn:active::after { opacity: 1; }
+
+/* Floating icon animation for empty states */
+.bi.fs-1.text-secondary { animation: float 3s ease-in-out infinite; }
+
+/* Form focus glow */
+.form-control:focus, .form-select:focus {
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Progress bar animation */
+.progress-bar {
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    animation: shimmer 1s linear infinite;
+}
+
+/* Badge hover pop */
+.badge {
+    transition: all 0.2s ease;
+}
+.badge:hover {
+    transform: scale(1.08);
+}
+
+/* Table row slide-in */
+.table tbody tr {
+    animation: fadeInUp 0.3s ease-out both;
+}
+.table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+/* Gradient text for page titles */
+.page-header-title {
+    background: linear-gradient(135deg, #f8fafc 0%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Auth page animated gradient background */
+.auth-page-bg {
+    background: linear-gradient(-45deg, #0f172a, #1e3a5f, #0f172a, #1a1a3e);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    min-height: 100vh;
+}
+
+/* Glass card premium hover */
+.auth-card {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.auth-card:hover {
+    border-color: rgba(59,130,246,0.3);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6), 0 0 40px rgba(59,130,246,0.1);
+    transform: translateY(-4px);
+}
+
+/* Input group icon glow on focus */
+.input-group:focus-within .input-group-text {
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    transition: all 0.3s ease;
+}
+.input-group:focus-within .input-group-text i {
+    color: var(--accent-hover) !important;
+}
+
+/* Spinner/loading pulse */
+.spinner-grow { animation: pulseGlow 1.5s ease-in-out infinite; }
+
+/* Smooth page transition */
+.page-content { animation: fadeInScale 0.4s ease-out; }
+
+/* Link hover underline effect */
+a.text-decoration-none:hover {
+    text-shadow: 0 0 8px rgba(96,165,250,0.3);
+}
+
+/* Mobile touch feedback */
+@media (max-width: 768px) {
+    .btn:active { transform: scale(0.97); }
+    .sidebar-link:active { transform: translateX(3px); }
+    .card:hover { transform: none; }
+    .card:active { transform: scale(0.99); }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .content-area { padding: 1.5rem; }
+    .page-header-title { font-size: 1.4rem; }
+    .stat-card-number { font-size: 1.8rem; }
 }
