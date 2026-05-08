@@ -33,9 +33,28 @@ $stats = $databaseConnection->query("
             <p class="text-secondary m-0">System status: All services operational. Secure node access granted.</p>
         </div>
     </div>
+    <!-- Loyalty Hub Node -->
+    <div class="col-lg-4">
+        <div class="card h-100 border-primary border-opacity-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="text-white fw-bold m-0"><i class="bi bi-gem me-2 text-primary"></i>LOYALTY HUB</h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 x-small fw-bold">SILVER RANK</span>
+            </div>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-secondary small fw-bold">VANGUARD POINTS</span>
+                    <span class="text-white fw-900"><?php echo (int)($loggedUser['loyalty_points'] ?? 0); ?> / 1000</span>
+                </div>
+                <div class="vanguard-progress">
+                    <div class="vanguard-progress-bar" style="width: <?php echo min(100, (int)($loggedUser['loyalty_points'] ?? 0) / 10); ?>%"></div>
+                </div>
+            </div>
+            <p class="x-small text-secondary m-0">Earn 50 more points to unlock <span class="text-info">Premium Node Pricing</span>.</p>
+        </div>
+    </div>
 </div>
 
-<div class="row g-4 mb-5">
+<div class="row g-4 mt-2 mb-5">
     <div class="col-md-4">
         <div class="card h-100 border-info border-opacity-10">
             <div class="small text-secondary mb-2 fw-bold">ACTIVE RESERVATIONS</div>

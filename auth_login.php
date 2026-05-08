@@ -1,25 +1,31 @@
 <?php
+// 1. LOGIC FIRST
 require_once 'config_database.php';
-$errors = [];
+require_once 'helper_authentication.php';
+
+if (userIsLoggedIn()) {
+    header('Location: ' . (userIsAdmin() ? 'admin_dashboard_home.php' : 'user_dashboard_home.php'));
+    exit;
+}
+
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
-    $pass  = trim($_POST['password'] ?? '');
-    $stmt = $databaseConnection->prepare("SELECT id, full_name, password_hash, is_admin FROM users WHERE email = ? LIMIT 1");
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($user = $result->fetch_assoc()) {
-        if (password_verify($pass, $user['password_hash']) || $pass === 'admin123') {
-            $_SESSION['user_id']   = $user['id'];
-            $_SESSION['is_admin']  = $user['is_admin'];
-            $_SESSION['full_name'] = $user['full_name'];
-            header('Location: ' . ($user['is_admin'] ? 'admin_dashboard_home.php' : 'user_dashboard_home.php'));
-            exit;
-        } else {
-            $errors[] = 'Credentials do not match our secure records.';
-        }
-    } else {
-        $errors[] = 'Authentication failed. Account not recognized.';
+    $pass  = $_POST['password'] ?? '';
+    
+    if ($email && $pass) {
+        $stmt = $databaseConnection->prepare("SELECT id, password_hash, is_admin FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($u = $res->fetch_assoc()) {
+            if (password_verify($pass, $u['password_hash'])) {
+                $_SESSION['user_id']  = $u['id'];
+                $_SESSION['is_admin'] = (bool)$u['is_admin'];
+                header('Location: ' . ($u['is_admin'] ? 'admin_dashboard_home.php' : 'user_dashboard_home.php'));
+                exit;
+            } else { $error = 'Neural mismatch: Credentials rejected.'; }
+        } else { $error = 'Node not found: Identity unrecognized.'; }
     }
 }
 ?>
@@ -28,76 +34,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Secure Access | Smart Parking</title>
+    <link rel="manifest" href="manifest.json">
+    <title>Secure Login | SP CORE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="ui_theme_main.css?v=9.0">
+    <link rel="stylesheet" href="ui_theme_main.css?v=10.0">
     <style>
-        body { 
-            padding: 0 !important; margin: 0 !important; 
-            background: #020617 url('futuristic_dark_parking_bg_1778267355133.png') no-repeat center center fixed !important;
-            background-size: cover !important;
-            overflow: hidden; 
+        .scan-line {
+            position: fixed; top: -10%; left: 0; width: 100%; height: 10%;
+            background: linear-gradient(to bottom, transparent, var(--accent-main), transparent);
+            z-index: 10000; display: none;
+            box-shadow: 0 0 20px var(--accent-main);
+            opacity: 0.5;
         }
-        body::before {
-            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(2, 6, 23, 0.9) 100%) !important;
+        @keyframes scan {
+            from { top: -10%; }
+            to { top: 110%; }
         }
-        .particle {
-            position: absolute; background: rgba(56, 189, 248, 0.2); border-radius: 50%;
-            pointer-events: none; animation: float 15s infinite ease-in-out;
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
-        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; z-index: 10; }
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
-    <!-- Animated Gravity Particles -->
-    <div class="particle" style="width: 300px; height: 300px; top: -100px; right: -50px; filter: blur(80px);"></div>
-    <div class="particle" style="width: 250px; height: 250px; bottom: -50px; left: -50px; background: rgba(129, 140, 248, 0.2); filter: blur(60px); animation-delay: -2s;"></div>
-
-    <div class="login-container">
-        <div class="col-md-5 col-lg-4 px-4">
-            <div class="text-center mb-5" style="animation: slideInUp 0.6s ease-out;">
-                <div class="d-inline-flex p-4 rounded-circle bg-primary bg-opacity-10 mb-3" style="border: 1px solid rgba(56, 189, 248, 0.3); animation: float 6s infinite ease-in-out;">
-                    <i class="bi bi-shield-lock-fill text-info fs-1"></i>
+    <div class="scan-line" id="scanner"></div>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="text-center mb-5">
+                <div class="p-3 bg-primary bg-opacity-10 rounded-4 d-inline-flex mb-4 border border-primary border-opacity-25">
+                    <i class="bi bi-shield-lock-fill text-primary fs-1"></i>
                 </div>
-                <h1 class="fw-800 text-white" style="letter-spacing: -1px;">CORE ACCESS</h1>
-                <p class="text-secondary small">Smart Parking Management System v3.0</p>
+                <h2 class="fw-900 text-white m-0" style="letter-spacing: -1px;">Smart <span class="text-primary">Parking</span> System</h2>
+                <p class="text-secondary small fw-bold mt-2">VANGUARD OPERATING SYSTEM</p>
             </div>
 
-            <div class="card p-4 p-md-5 border-info border-opacity-10" style="animation: slideInUp 0.8s ease-out both;">
-                <!-- Glow Scan Biometric Simulation -->
-                <div class="position-absolute top-0 start-0 w-100" style="height: 2px; background: var(--accent-glow); box-shadow: 0 0 15px var(--accent-glow); animation: scanLine 3s infinite ease-in-out; opacity: 0.5;"></div>
-                
-                <?php foreach ($errors as $e): ?>
-                    <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger small mb-4">
-                        <i class="bi bi-exclamation-octagon-fill me-2"></i><?php echo $e; ?>
-                    </div>
-                <?php endforeach; ?>
-
-                <form method="post">
-                    <div class="mb-4">
-                        <label class="form-label text-secondary small fw-bold">NETWORK IDENTITY (EMAIL)</label>
-                        <input type="email" name="email" class="form-control" placeholder="admin@system.com" required autofocus>
-                    </div>
-
-                    <div class="mb-5">
-                        <label class="form-label text-secondary small fw-bold">ACCESS TOKEN (PASSWORD)</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-                    </div>
-
-                    <button class="btn-primary w-100">INITIALIZE SESSION <i class="bi bi-chevron-right ms-2"></i></button>
-                </form>
-
-                <div class="mt-4 text-center">
-                    <a href="auth_register.php" class="text-decoration-none small text-info opacity-75 hover-opacity-100">Request New Access Node</a>
+            <?php if ($error): ?>
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-0 text-danger mb-4 rounded-4 small">
+                    <i class="bi bi-exclamation-octagon me-2"></i><?php echo $error; ?>
                 </div>
-            </div>
-            
-            <div class="mt-5 text-center text-secondary small opacity-50">
-                &copy; <?php echo date('Y'); ?> JARIF OVI SOFTWARE LABS &middot; ENCRYPTED SESSION
-            </div>
+            <?php endif; ?>
+
+            <form id="loginForm" method="post" onsubmit="runScan(event)">
+                <div class="mb-4">
+                    <label class="form-label text-secondary small fw-bold">NETWORK IDENTITY (EMAIL)</label>
+                    <input type="email" name="email" class="form-control" placeholder="operator@sp-core.io" required autofocus>
+                </div>
+                <div class="mb-5">
+                    <label class="form-label text-secondary small fw-bold">SECURITY KEY (PASSWORD)</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-primary w-100 py-3 mb-4">
+                    INITIALIZE SESSION <i class="bi bi-chevron-right ms-2"></i>
+                </button>
+
+                <div class="text-center">
+                    <p class="text-secondary small mb-0">New node in the network? <a href="auth_register.php" class="text-primary text-decoration-none fw-bold">Register Identity</a></p>
+                </div>
+            </form>
         </div>
     </div>
+    <script>
+        function runScan(e) {
+            e.preventDefault();
+            const scanner = document.getElementById('scanner');
+            scanner.style.display = 'block';
+            scanner.style.animation = 'scan 1.5s linear infinite';
+            setTimeout(() => {
+                document.getElementById('loginForm').submit();
+            }, 1500);
+        }
+    </script>
 </body>
 </html>

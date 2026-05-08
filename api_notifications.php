@@ -1,15 +1,21 @@
 <?php
-require_once 'helper_database.php';
+// Start session to access $_SESSION data
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once 'config_database.php';
 require_once 'helper_authentication.php';
 
 header('Content-Type: application/json');
 
-if (!isLoggedIn()) {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+// Using the correct function name: userIsLoggedIn()
+if (!userIsLoggedIn()) {
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized Access']);
     exit;
 }
 
-$userId = $_SESSION['user_id'];
+$userId = (int)$_SESSION['user_id'];
 
 // Handle Mark as Read
 if (isset($_GET['mark_read'])) {
@@ -26,22 +32,28 @@ $result = $databaseConnection->query("
 ");
 
 $notifications = [];
-while ($row = $result->fetch_assoc()) {
-    $notifications[] = [
-        'id' => $row['id'],
-        'message' => $row['message'],
-        'is_read' => (bool)$row['is_read'],
-        'time' => date('M d, H:i', strtotime($row['created_at']))
-    ];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $notifications[] = [
+            'id' => $row['id'],
+            'message' => $row['message'],
+            'is_read' => (bool)$row['is_read'],
+            'time' => date('M d, H:i', strtotime($row['created_at']))
+        ];
+    }
 }
 
-$unreadCount = $databaseConnection->query("
+$unreadCount = 0;
+$unreadRes = $databaseConnection->query("
     SELECT COUNT(*) as count FROM user_notifications 
     WHERE user_id = $userId AND is_read = 0
-")->fetch_assoc()['count'];
+");
+if ($unreadRes) {
+    $unreadCount = (int)$unreadRes->fetch_assoc()['count'];
+}
 
 echo json_encode([
     'status' => 'success',
-    'unread_count' => (int)$unreadCount,
+    'unread_count' => $unreadCount,
     'notifications' => $notifications
 ]);

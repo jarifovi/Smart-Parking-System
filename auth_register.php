@@ -1,44 +1,34 @@
 <?php
-// auth_register.php
+// 1. LOGIC FIRST
 require_once 'config_database.php';
+require_once 'helper_authentication.php';
 
-$errors = [];
+if (userIsLoggedIn()) {
+    header('Location: ' . (userIsAdmin() ? 'admin_dashboard_home.php' : 'user_dashboard_home.php'));
+    exit;
+}
+
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name  = trim($_POST['full_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
-    $pass1 = $_POST['password'] ?? '';
-    $pass2 = $_POST['password_confirm'] ?? '';
-
-    if ($name === '' || $email === '' || $pass1 === '') {
-        $errors[] = 'All fields are required.';
-    }
-    if ($pass1 !== $pass2) {
-        $errors[] = 'Passwords do not match.';
-    }
-
-    if (!$errors) {
-        $stmt = $databaseConnection->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $errors[] = 'Email already exists.';
+    $pass  = $_POST['password'] ?? '';
+    
+    if ($name && $email && $pass) {
+        // Check if email exists
+        $check = $databaseConnection->prepare("SELECT id FROM users WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        if ($check->get_result()->num_rows > 0) {
+            $error = 'Conflict: Email already registered in the network.';
         } else {
-            $hash = password_hash($pass1, PASSWORD_DEFAULT);
-            $stmtInsert = $databaseConnection->prepare(
-                "INSERT INTO users (full_name, email, password_hash, is_admin) VALUES (?,?,?,0)"
-            );
-            $stmtInsert->bind_param('sss', $name, $email, $hash);
-            if ($stmtInsert->execute()) {
-                $newUserId = $stmtInsert->insert_id;
-                $databaseConnection->query(
-                    "INSERT INTO user_notifications (user_id) VALUES ($newUserId)"
-                );
+            $hashed = password_hash($pass, PASSWORD_DEFAULT);
+            $stmt = $databaseConnection->prepare("INSERT INTO users (full_name, email, password_hash, is_admin) VALUES (?, ?, ?, 0)");
+            $stmt->bind_param("sss", $name, $email, $hashed);
+            if ($stmt->execute()) {
                 header('Location: auth_login.php?registered=1');
                 exit;
-            } else {
-                $errors[] = 'Registration failed.';
-            }
+            } else { $error = 'System fault: Failed to initialize node.'; }
         }
     }
 }
@@ -48,78 +38,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register | Smart Parking System</title>
+    <link rel="manifest" href="manifest.json">
+    <title>Register Identity | SP CORE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="ui_theme_main.css">
-    <style>body{padding:0!important;padding-left:0!important;}body::before{display:none;}</style>
+    <link rel="stylesheet" href="ui_theme_main.css?v=10.0">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
-<body class="auth-page-bg d-flex align-items-center justify-content-center" style="min-height:100vh;">
-<div class="container px-3">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="text-center mb-4" style="animation:fadeInDown 0.6s ease-out;">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:72px;height:72px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);box-shadow:0 0 30px rgba(139,92,246,0.4);">
-                    <i class="bi bi-person-plus-fill text-white fs-1"></i>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="text-center mb-5">
+                <div class="p-3 bg-primary bg-opacity-10 rounded-4 d-inline-flex mb-4 border border-primary border-opacity-25">
+                    <i class="bi bi-person-plus-fill text-primary fs-1"></i>
                 </div>
-                <h2 class="fw-bold text-white mb-1">Create Account</h2>
-                <p class="text-secondary small mb-0">Join the Smart Parking network today</p>
+                <h2 class="fw-900 text-white m-0" style="letter-spacing: -1px;">Smart <span class="text-primary">Parking</span> System</h2>
+                <p class="text-secondary small fw-bold mt-2">CREATE YOUR NETWORK IDENTITY</p>
             </div>
-            <div class="auth-card p-4 p-md-5" style="animation:fadeInUp 0.6s ease-out 0.2s both;">
-                <h4 class="mb-1 text-center fw-bold text-white">Sign Up</h4>
-                <p class="text-center text-secondary small mb-4">Fill in your details to get started</p>
-                <?php foreach ($errors as $e): ?>
-                    <div class="alert alert-danger small mb-4 border-0">
-                        <i class="bi bi-exclamation-triangle me-2"></i><?php echo htmlspecialchars($e); ?>
-                    </div>
-                <?php endforeach; ?>
-                <form method="post">
-                    <div class="mb-3">
-                        <label class="form-label text-secondary small">Full Name</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-end-0 border-secondary-subtle"><i class="bi bi-person text-secondary"></i></span>
-                            <input type="text" name="full_name" class="form-control border-start-0 ps-0" placeholder="John Doe" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-secondary small">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-end-0 border-secondary-subtle"><i class="bi bi-envelope text-secondary"></i></span>
-                            <input type="email" name="email" class="form-control border-start-0 ps-0" placeholder="name@example.com" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-secondary small">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 border-secondary-subtle"><i class="bi bi-lock text-secondary"></i></span>
-                                <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-secondary small">Confirm Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 border-secondary-subtle"><i class="bi bi-shield-lock text-secondary"></i></span>
-                                <input type="password" name="password_confirm" class="form-control border-start-0 ps-0" placeholder="••••••••" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-4 form-check small">
-                        <input type="checkbox" class="form-check-input" id="terms" required>
-                        <label class="form-check-label text-secondary" for="terms">I agree to the <a href="#" style="color:var(--accent-hover);">Terms & Conditions</a></label>
-                    </div>
-                    <button class="btn btn-primary w-100 py-2 fw-bold">Register Account <i class="bi bi-arrow-right ms-1"></i></button>
-                </form>
-                <div class="mt-4 text-center small text-secondary">
-                    Already have an account? <a href="auth_login.php" class="text-decoration-none fw-bold" style="color:var(--accent-hover);">Sign In</a>
+
+            <?php if ($error): ?>
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-0 text-danger mb-4 rounded-4 small">
+                    <i class="bi bi-exclamation-octagon me-2"></i><?php echo $error; ?>
                 </div>
-            </div>
-            <div class="mt-4 text-center text-secondary small" style="animation:fadeInUp 0.6s ease-out 0.4s both;opacity:0.5;">
-                &copy; <?php echo date('Y'); ?> Smart Parking System &middot; Crafted by <strong>Jarif Ovi</strong>
-            </div>
+            <?php endif; ?>
+
+            <form method="post">
+                <div class="mb-4">
+                    <label class="form-label text-secondary small fw-bold">FULL LEGAL NAME</label>
+                    <input type="text" name="full_name" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-secondary small fw-bold">NETWORK IDENTITY (EMAIL)</label>
+                    <input type="email" name="email" class="form-control" placeholder="user@sp-core.io" required>
+                </div>
+                <div class="mb-5">
+                    <label class="form-label text-secondary small fw-bold">SECURITY KEY (PASSWORD)</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-primary w-100 py-3 mb-4">
+                    REGISTER IDENTITY <i class="bi bi-plus-lg ms-2"></i>
+                </button>
+
+                <div class="text-center">
+                    <p class="text-secondary small mb-0">Already in the network? <a href="auth_login.php" class="text-primary text-decoration-none fw-bold">Initialize Session</a></p>
+                </div>
+            </form>
         </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

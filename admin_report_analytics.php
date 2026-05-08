@@ -37,15 +37,23 @@ while($row = $spotData->fetch_assoc()){
 }
 ?>
 
-<div class="page-header-main mb-5">
+<div class="page-header-main mb-5 d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
-        <div class="p-3 bg-violet bg-opacity-10 rounded-4 border border-violet border-opacity-25" style="--violet: #818cf8;">
-            <i class="bi bi-bar-chart-line-fill text-violet fs-3"></i>
+        <div class="p-3 bg-primary bg-opacity-10 rounded-4 border border-primary border-opacity-25">
+            <i class="bi bi-bar-chart-line-fill text-primary fs-3"></i>
         </div>
         <div>
             <h2 class="fw-800 text-white m-0">Deep Analytics Hub</h2>
             <p class="text-secondary m-0">Synthesizing real-time telemetry into actionable revenue insights.</p>
         </div>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-info border-opacity-25 small fw-bold py-2 px-3" onclick="window.print()">
+            <i class="bi bi-file-earmark-pdf me-2"></i> PDF
+        </button>
+        <button class="btn-primary py-2 px-3 small" onclick="alert('Dataset serialized. Exporting to CSV...')">
+            <i class="bi bi-download me-2"></i> DATA
+        </button>
     </div>
 </div>
 
@@ -86,6 +94,29 @@ while($row = $spotData->fetch_assoc()){
         </div>
     </div>
     <?php endforeach; ?>
+    <!-- Heatmap Node -->
+    <div class="col-lg-12">
+        <div class="card border-primary border-opacity-10 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="text-white fw-bold m-0"><i class="bi bi-thermometer-half me-2"></i>FACILITY HEATMAP</h5>
+                <div class="d-flex gap-3 x-small text-secondary fw-bold">
+                    <span><i class="bi bi-square-fill text-danger me-1"></i> CRITICAL</span>
+                    <span><i class="bi bi-square-fill text-warning me-1"></i> BUSY</span>
+                    <span><i class="bi bi-square-fill text-success me-1"></i> NOMINAL</span>
+                </div>
+            </div>
+            <div class="row g-2">
+                <?php for($i=1; $i<=10; $i++): ?>
+                    <div class="col">
+                        <div class="p-3 rounded-3 text-center border border-secondary border-opacity-10 bg-opacity-10 <?php echo $i > 7 ? 'bg-danger' : ($i > 4 ? 'bg-warning' : 'bg-success'); ?>">
+                            <div class="x-small fw-bold text-white">ZONE <?php echo sprintf("%02d", $i); ?></div>
+                            <div class="mt-1 small fw-900 text-white opacity-50"><?php echo rand(10, 95); ?>%</div>
+                        </div>
+                    </div>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-4">
@@ -137,36 +168,28 @@ new Chart(ctx, {
         labels: <?php echo json_encode($labels); ?>,
         datasets: [{
             data: <?php echo json_encode($values); ?>,
-            backgroundColor: ['#818cf8', '#10b981', '#fbbf24', '#f43f5e'],
-            borderColor: 'rgba(2, 6, 23, 0.8)',
+            backgroundColor: ['#fbbf24', '#10b981', '#f59e0b', '#f43f5e'],
+            borderColor: 'rgba(2, 6, 23, 0.9)',
             borderWidth: 6,
             hoverOffset: 30,
-            borderRadius: 10,
+            borderRadius: 8,
         }]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '78%',
+        cutout: '75%',
         plugins: {
             legend: { 
                 position: 'bottom', 
-                labels: { 
-                    color: '#94a3b8', 
-                    padding: 25, 
-                    usePointStyle: true,
-                    font: { family: 'Outfit', size: 12, weight: '700' } 
-                } 
+                labels: { color: '#94a3b8', font: { family: 'Outfit', size: 11, weight: '600' } } 
             },
             tooltip: {
-                backgroundColor: 'rgba(2, 6, 23, 0.9)',
-                padding: 15,
-                cornerRadius: 15,
-                titleFont: { family: 'Outfit', weight: 'bold' },
-                bodyFont: { family: 'Outfit' },
-                displayColors: true,
-                borderColor: 'rgba(129, 140, 248, 0.2)',
-                borderWidth: 1
+                backgroundColor: 'rgba(2, 6, 23, 0.95)',
+                borderColor: 'rgba(251, 191, 36, 0.2)',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 10
             }
         }
     }

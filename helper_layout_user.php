@@ -13,6 +13,8 @@ if (!empty($loggedUser['full_name'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#fbbf24">
     <title><?php echo htmlspecialchars($pageTitle ?? 'User Portal'); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -27,41 +29,36 @@ if (!empty($loggedUser['full_name'])) {
     <!-- Sidebar -->
     <div class="sidebar-fixed">
         <div class="sidebar-brand">
-            <h4 class="m-0">SP CORE <small class="text-mute opacity-50 fw-normal">v3.0</small></h4>
-            <div class="x-small text-info opacity-50 fw-bold mt-1" style="letter-spacing: 1px; font-size: 0.6rem;">USER NODE</div>
+            <h4 class="m-0 fw-900 text-white">Smart <span class="text-primary">Parking</span></h4>
+            <div class="x-small text-secondary fw-bold mt-1" style="letter-spacing: 1px; font-size: 0.6rem;">SYSTEM CORE</div>
         </div>
 
         <nav class="flex-grow-1">
             <a href="user_dashboard_home.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_dashboard' ? 'active' : ''; ?>">
-                <i class="bi bi-grid-1x2-fill"></i>
-                <span>Portal Overview</span>
+                <i class="bi bi-box-fill"></i>
+                <span>Node Overview</span>
             </a>
             <a href="user_booking_new.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_book_new' ? 'active' : ''; ?>">
-                <i class="bi bi-plus-square-fill"></i>
-                <span>New Reservation</span>
+                <i class="bi bi-plus-circle-dotted"></i>
+                <span>Initialize Booking</span>
             </a>
             <a href="user_bookings_list.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_bookings' ? 'active' : ''; ?>">
-                <i class="bi bi-clock-history"></i>
-                <span>My Sessions</span>
+                <i class="bi bi-journal-code"></i>
+                <span>Session Ledger</span>
             </a>
             <a href="user_vehicles.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_vehicles' ? 'active' : ''; ?>">
-                <i class="bi bi-car-front-fill"></i>
-                <span>My Fleet</span>
+                <i class="bi bi-car-front"></i>
+                <span>Fleet Telemetry</span>
+            </a>
+            <a href="user_id_forge.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_forge' ? 'active' : ''; ?>">
+                <i class="bi bi-person-badge-fill"></i>
+                <span>Access Forge</span>
             </a>
         </nav>
 
         <div class="mt-auto pt-3 border-top border-secondary border-opacity-10">
-            <div class="d-flex align-items-center gap-2 mb-3 px-2">
-                <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                    <i class="bi bi-person-fill"></i>
-                </div>
-                <div class="overflow-hidden">
-                    <div class="text-white x-small fw-bold text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
-                    <div class="text-mute" style="font-size: 0.6rem; opacity: 0.5;">ID: #<?php echo $loggedUser['id']; ?></div>
-                </div>
-            </div>
-            <a href="auth_logout.php" class="btn btn-outline-danger w-100 py-2 border-opacity-25 x-small fw-bold">
-                TERMINATE
+            <a href="auth_logout.php" class="btn btn-sm btn-outline-danger w-100 border-opacity-25 x-small fw-bold py-2">
+                <i class="bi bi-power me-2"></i> TERMINATE SESSION
             </a>
         </div>
     </div>
@@ -73,7 +70,13 @@ if (!empty($loggedUser['full_name'])) {
                 <div class="spinner-grow spinner-grow-sm text-info"></div>
                 <span class="small text-secondary fw-bold">ZONE STATUS: <span class="text-success">GATES OPEN</span></span>
             </div>
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-4">
+                <!-- Weather Telemetry -->
+                <div class="d-flex align-items-center gap-2 bg-dark bg-opacity-50 px-3 py-1 rounded-pill border border-secondary border-opacity-10">
+                    <i class="bi bi-cloud-sun text-info"></i>
+                    <span class="x-small fw-bold text-secondary">28°C / HUMID</span>
+                </div>
+
                 <!-- Notification Node -->
                 <div class="dropdown">
                     <div class="position-relative cursor-pointer" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">

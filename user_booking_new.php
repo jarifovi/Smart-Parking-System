@@ -1,7 +1,8 @@
 <?php
-$pageTitle  = 'Node Reservation';
-$sidebarKey = 'user_book_new';
-require_once 'helper_layout_user.php';
+// 1. ALL LOGIC AND REDIRECTS MUST HAPPEN BEFORE ANY HTML OUTPUT
+require_once 'config_database.php';
+require_once 'helper_authentication.php';
+requireLogin();
 
 $userId  = (int)($_SESSION['user_id'] ?? 0);
 $error   = '';
@@ -27,6 +28,7 @@ function toHtmlDateTime(?string $val) {
 $startMysql = toMysqlDateTime($startRaw);
 $endMysql   = toMysqlDateTime($endRaw);
 
+// Handle Confirmation (Redirect)
 if ($action === 'confirm_booking') {
     if (!$vehicleLabel || !$startMysql || !$endMysql || !$selectedSpot) {
         $error = 'Incomplete telemetry: Vehicle ID, time range, and node selection are required.';
@@ -49,12 +51,18 @@ if ($action === 'confirm_booking') {
             $stmt2 = $databaseConnection->prepare("INSERT INTO bookings (user_id, spot_id, vehicle_label, vehicle_type, start_time, end_time, status, amount) VALUES (?, ?, ?, ?, ?, ?, 'active', ?)");
             $stmt2->bind_param('iissssd', $userId, $spotId, $vehicleLabel, $vehicleType, $startMysql, $endMysql, $amount);
             if ($stmt2->execute()) {
+                // REDIRECT WORKS HERE BECAUSE NO HTML HAS BEEN SENT YET
                 header('Location: user_bookings_list.php?success=1');
                 exit;
             } else { $error = 'System fault: Failed to commit reservation to registry.'; }
         } else { $error = 'Node conflict: The selected parking node is no longer available.'; }
     }
 }
+
+// 2. NOW WE CAN START THE LAYOUT AFTER LOGIC IS DONE
+$pageTitle  = 'Node Reservation';
+$sidebarKey = 'user_book_new';
+require_once 'helper_layout_user.php';
 
 $hasTimeFilter = ($action === 'check' || $action === 'confirm_booking');
 $bookedSpotIds = [];
@@ -72,6 +80,7 @@ if ($hasTimeFilter && $startMysql && $endMysql) {
 }
 ?>
 
+<!-- ... Rest of the HTML code remains the same ... -->
 <div class="page-header-main mb-5">
     <div class="d-flex align-items-center gap-3">
         <div class="p-3 bg-primary bg-opacity-10 rounded-4 border border-primary border-opacity-25">
@@ -143,9 +152,15 @@ if ($hasTimeFilter && $startMysql && $endMysql) {
                                 $id = (int)$spot['id'];
                                 $isBooked = isset($bookedSpotIds[$id]);
                                 $isSelected = (!$isBooked && (string)$selectedSpot === (string)$id);
+                                $isEV = isset($spot['is_ev_ready']) && $spot['is_ev_ready'];
                                 $class = 'spot-tile ' . ($isBooked ? 'booked' : ($isSelected ? 'selected' : 'available'));
+                                if ($isEV) $class .= ' ev-node';
                             ?>
-                                <div class="<?php echo $class; ?>" data-spot-id="<?php echo $id; ?>" data-spot-label="<?php echo htmlspecialchars($spot['spot_number']); ?>">
+                                <div class="<?php echo $class; ?>" 
+                                     data-spot-id="<?php echo $id; ?>" 
+                                     data-spot-label="<?php echo htmlspecialchars($spot['spot_number']); ?>"
+                                     style="min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                    <?php if ($isEV): ?><i class="bi bi-lightning-charge-fill ev-icon"></i><?php endif; ?>
                                     <span><?php echo htmlspecialchars($spot['spot_number']); ?></span>
                                     <span class="small-label"><?php echo $spot['spot_type']; ?></span>
                                 </div>
