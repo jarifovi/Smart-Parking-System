@@ -171,9 +171,9 @@ $totalRevenue   = $databaseConnection->query("SELECT IFNULL(SUM(amount),0) AS s 
 <script>
 const ctx = document.getElementById('revenueChart').getContext('2d');
 const glowGradient = ctx.createLinearGradient(0, 0, 0, 400);
-glowGradient.addColorStop(0, 'rgba(56, 189, 248, 0.6)');
-glowGradient.addColorStop(0.5, 'rgba(56, 189, 248, 0.1)');
-glowGradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
+glowGradient.addColorStop(0, 'rgba(129, 140, 248, 0.5)');
+glowGradient.addColorStop(0.5, 'rgba(129, 140, 248, 0.1)');
+glowGradient.addColorStop(1, 'rgba(129, 140, 248, 0)');
 
 new Chart(ctx, {
     type: 'line',
@@ -182,18 +182,18 @@ new Chart(ctx, {
         datasets: [{
             label: 'REVENUE TELEMETRY',
             data: [1200, 1900, 1500, 2800, 2200, 4000, 3500],
-            borderColor: '#38bdf8',
+            borderColor: '#818cf8',
             borderWidth: 5,
             fill: true,
             backgroundColor: glowGradient,
             tension: 0.5,
             pointBackgroundColor: '#fff',
-            pointBorderColor: '#38bdf8',
+            pointBorderColor: '#818cf8',
             pointBorderWidth: 3,
             pointRadius: 0,
             pointHoverRadius: 8,
             pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#38bdf8',
+            pointHoverBorderColor: '#818cf8',
             pointHoverBorderWidth: 4,
         }]
     },
@@ -204,13 +204,13 @@ new Chart(ctx, {
             legend: { display: false },
             tooltip: {
                 enabled: true,
-                backgroundColor: 'rgba(5, 5, 5, 0.8)',
+                backgroundColor: 'rgba(2, 6, 23, 0.9)',
                 titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
                 bodyFont: { family: 'Outfit', size: 16 },
                 padding: 15,
-                cornerRadius: 20,
+                cornerRadius: 15,
                 displayColors: false,
-                borderColor: 'rgba(255,255,255,0.1)',
+                borderColor: 'rgba(129, 140, 248, 0.2)',
                 borderWidth: 1,
                 callbacks: {
                     label: (item) => `$${item.raw.toLocaleString()}`

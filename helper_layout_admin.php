@@ -31,43 +31,48 @@ if (!empty($loggedUser['full_name'])) {
     <div class="gravity-dot" style="top: 40%; left: 90%; animation-duration: 10s; animation-delay: -5s; background: var(--accent-violet);"></div>
     
     <!-- Sidebar -->
-    <div class="sidebar-fixed" id="sidebarMenu">
-        <div class="text-center mb-5">
-            <div class="d-inline-flex p-3 rounded-4 bg-primary bg-opacity-10 mb-3" style="border: 1px solid rgba(56, 189, 248, 0.3);">
-                <i class="bi bi-p-circle-fill fs-2 text-info"></i>
-            </div>
-            <h4 class="fw-800 text-white m-0">SMART PARKING</h4>
-            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 mt-2">ADMIN CORE v3.0</span>
+    <div class="sidebar-fixed">
+        <div class="sidebar-brand">
+            <h4>SP CORE <small class="text-mute fs-6 opacity-50">v3.0</small></h4>
+            <div class="small text-info opacity-75 fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">ADMIN COMMAND NODE</div>
         </div>
 
-        <nav class="nav flex-column gap-2">
+        <nav class="flex-grow-1">
             <a href="admin_dashboard_home.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_dashboard' ? 'active' : ''; ?>">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard Overview
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard Overview</span>
             </a>
             <a href="admin_user_management.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_users' ? 'active' : ''; ?>">
-                <i class="bi bi-people-fill"></i> Operator Control
+                <i class="bi bi-people-fill"></i>
+                <span>Operator Control</span>
             </a>
             <a href="admin_parking_spot_management.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_spots' ? 'active' : ''; ?>">
-                <i class="bi bi-geo-fill"></i> Zone Management
+                <i class="bi bi-geo-fill"></i>
+                <span>Zone Management</span>
             </a>
             <a href="admin_booking_management.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_bookings' ? 'active' : ''; ?>">
-                <i class="bi bi-calendar-event-fill"></i> Active Sessions
+                <i class="bi bi-calendar-event-fill"></i>
+                <span>Active Sessions</span>
+            </a>
+            <a href="admin_report_analytics.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'admin_reports' ? 'active' : ''; ?>">
+                <i class="bi bi-bar-chart-fill"></i>
+                <span>Deep Analytics</span>
             </a>
         </nav>
 
-        <div class="mt-auto pt-5">
-            <div class="card bg-dark bg-opacity-50 border-0 p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-initials bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold;">
-                        <?php echo $initials; ?>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="small fw-bold text-white text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
-                        <div class="text-secondary small" style="font-size: 0.7rem;">Super Administrator</div>
-                    </div>
+        <div class="mt-auto pt-4 border-top border-secondary border-opacity-10">
+            <div class="d-flex align-items-center gap-3 mb-3 px-2">
+                <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-shield-lock-fill"></i>
                 </div>
-                <a href="auth_logout.php" class="btn btn-sm btn-outline-danger w-100 mt-3 border-opacity-25">Logout System</a>
+                <div class="overflow-hidden">
+                    <div class="text-white small fw-bold text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
+                    <div class="text-mute x-small opacity-50">Super Administrator</div>
+                </div>
             </div>
+            <a href="auth_logout.php" class="btn btn-outline-danger w-100 py-2 border-opacity-25 x-small fw-bold">
+                LOGOUT SYSTEM
+            </a>
         </div>
     </div>
 

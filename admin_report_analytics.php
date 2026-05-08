@@ -137,17 +137,38 @@ new Chart(ctx, {
         labels: <?php echo json_encode($labels); ?>,
         datasets: [{
             data: <?php echo json_encode($values); ?>,
-            backgroundColor: ['#0ea5e9', '#818cf8', '#f59e0b', '#10b981'],
-            borderColor: 'rgba(255,255,255,0.1)',
-            borderWidth: 2,
-            hoverOffset: 20
+            backgroundColor: ['#818cf8', '#10b981', '#fbbf24', '#f43f5e'],
+            borderColor: 'rgba(2, 6, 23, 0.8)',
+            borderWidth: 6,
+            hoverOffset: 30,
+            borderRadius: 10,
         }]
     },
     options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '78%',
         plugins: {
-            legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { weight: 'bold' } } }
-        },
-        cutout: '75%'
+            legend: { 
+                position: 'bottom', 
+                labels: { 
+                    color: '#94a3b8', 
+                    padding: 25, 
+                    usePointStyle: true,
+                    font: { family: 'Outfit', size: 12, weight: '700' } 
+                } 
+            },
+            tooltip: {
+                backgroundColor: 'rgba(2, 6, 23, 0.9)',
+                padding: 15,
+                cornerRadius: 15,
+                titleFont: { family: 'Outfit', weight: 'bold' },
+                bodyFont: { family: 'Outfit' },
+                displayColors: true,
+                borderColor: 'rgba(129, 140, 248, 0.2)',
+                borderWidth: 1
+            }
+        }
     }
 });
 </script>

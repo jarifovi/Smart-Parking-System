@@ -25,46 +25,44 @@ if (!empty($loggedUser['full_name'])) {
     <div class="gravity-dot" style="top: 30%; left: 85%; animation-duration: 13s; animation-delay: -4s; background: var(--accent-violet);"></div>
     
     <!-- Sidebar -->
-    <div class="sidebar-fixed" id="sidebarMenu">
-        <div class="text-center mb-5">
-            <div class="d-inline-flex p-3 rounded-4 bg-primary bg-opacity-10 mb-3" style="border: 1px solid rgba(56, 189, 248, 0.3);">
-                <i class="bi bi-p-circle-fill fs-2 text-info"></i>
-            </div>
-            <h4 class="fw-800 text-white m-0">SP PORTAL</h4>
-            <span class="badge bg-primary bg-opacity-10 text-info border border-primary border-opacity-25 mt-2">DASHBOARD v3.0</span>
+    <div class="sidebar-fixed">
+        <div class="sidebar-brand">
+            <h4>SP CORE <small class="text-mute fs-6 opacity-50">v3.0</small></h4>
+            <div class="small text-info opacity-75 fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">USER COMMAND NODE</div>
         </div>
 
-        <nav class="nav flex-column gap-2">
+        <nav class="flex-grow-1">
             <a href="user_dashboard_home.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_dashboard' ? 'active' : ''; ?>">
-                <i class="bi bi-speedometer2"></i> Portal Overview
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Portal Overview</span>
             </a>
             <a href="user_booking_new.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_book_new' ? 'active' : ''; ?>">
-                <i class="bi bi-plus-square-fill"></i> New Reservation
+                <i class="bi bi-plus-square-fill"></i>
+                <span>New Reservation</span>
             </a>
             <a href="user_bookings_list.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_bookings' ? 'active' : ''; ?>">
-                <i class="bi bi-list-stars"></i> My Sessions
+                <i class="bi bi-clock-history"></i>
+                <span>My Sessions</span>
             </a>
             <a href="user_vehicles.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_vehicles' ? 'active' : ''; ?>">
-                <i class="bi bi-car-front-fill"></i> My Fleet
-            </a>
-            <a href="user_support.php" class="sidebar-link <?php echo ($sidebarKey ?? '') === 'user_support' ? 'active' : ''; ?>">
-                <i class="bi bi-headset"></i> Support Hub
+                <i class="bi bi-car-front-fill"></i>
+                <span>My Fleet</span>
             </a>
         </nav>
 
-        <div class="mt-auto pt-5">
-            <div class="card bg-dark bg-opacity-50 border-0 p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-initials bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold;">
-                        <?php echo $initials; ?>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="small fw-bold text-white text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
-                        <div class="text-secondary small" style="font-size: 0.7rem;">Member ID: #<?php echo $loggedUser['id']; ?></div>
-                    </div>
+        <div class="mt-auto pt-4 border-top border-secondary border-opacity-10">
+            <div class="d-flex align-items-center gap-3 mb-3 px-2">
+                <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-person-fill"></i>
                 </div>
-                <a href="auth_logout.php" class="btn btn-sm btn-outline-danger w-100 mt-3 border-opacity-25">Exit Portal</a>
+                <div class="overflow-hidden">
+                    <div class="text-white small fw-bold text-truncate"><?php echo htmlspecialchars($loggedUser['full_name']); ?></div>
+                    <div class="text-mute x-small opacity-50">Member #<?php echo $loggedUser['id']; ?></div>
+                </div>
             </div>
+            <a href="auth_logout.php" class="btn btn-outline-danger w-100 py-2 border-opacity-25 x-small fw-bold">
+                TERMINATE SESSION
+            </a>
         </div>
     </div>
 
